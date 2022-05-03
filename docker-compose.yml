@@ -1,0 +1,20 @@
+version: '3'
+services:
+  auth:
+    build: auth/.
+    ports:
+      - "8001"
+  student:
+    build: student/.
+    ports:
+      - "8002"
+  teacher:
+    build: teacher/.
+    ports:
+      - "8003"
+  nginx:
+    image: nginx
+    ports:
+      - "8080:8080"
+    volumes:
+      - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
