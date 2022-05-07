@@ -2,7 +2,7 @@ var express = require('express');
 var app = express();
 var ip = require('ip');
 var port = 8001;
-const { Pool, Client } = require("pg");
+const { Pool } = require("pg");
 const credentials = {
     user: process.env.DB_USER,
     host: process.env.DB_HOST,
@@ -16,25 +16,22 @@ async function poolDemo() {
     await pool.end();
     return now;
   }
-async function clientDemo() {
-    const client = new Client(credentials);
-    await client.connect();
-    const now = await client.query("SELECT NOW()");
-    await client.end();
+
+async function createTable(){
+    const pool = new Pool(credentials);
+    const now = await pool.query("CREATE DATABASE testdb");
+    console.log("from query",now)
+    await pool.end();
     return now;
 }
+
 app.get('/*', async (req, res) =>{
-    const clientResult = await clientDemo();
-    console.log("Time with client: " + clientResult.rows[0]["now"]);
-    res.send("Hello Authentication API!"+clientResult);
+    res.send("Hello Authentication API!")
 });
 
 (async () => {
     const poolResult = await poolDemo();
     console.log("Time with pool: " + poolResult.rows[0]["now"]);
-  
-    const clientResult = await clientDemo();
-    console.log("Time with client: " + clientResult.rows[0]["now"]);
 })();
 
 app.listen(port, () => {
